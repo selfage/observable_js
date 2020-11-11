@@ -1,14 +1,22 @@
 const assert = require('assert');
-const makeObservable = require('./observable');
+const {toObservable, isObservable} = require('./observable');
 
-let callCount = 0;
-let callCount2 = 0;
-
-let ob = makeObservable({
+let rawObj = {
   num: 12,
   arr: [123, 32],
   nobj: {num: 20},
-});
+};
+assert(!isObservable(rawObj));
+assert(!isObservable(rawObj.arr));
+assert(!isObservable(rawObj.nobj));
+
+let ob = toObservable(rawObj);
+assert(isObservable(ob));
+assert(isObservable(ob.arr));
+assert(isObservable(ob.nobj));
+
+let callCount = 0;
+let callCount2 = 0;
 
 function assertNumberChange(prop, newValue, oldValue) {
   callCount++;

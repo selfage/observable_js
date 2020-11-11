@@ -1,11 +1,12 @@
 const assert = require('assert');
-const makeObservable = require('./observable');
+const {toObservable, isObservable} = require('./observable');
 
 let callCount = 0;
 let callCount2 = 0;
 let callCount3 = 0;
 
-let ob = makeObservable({});
+let ob = toObservable({});
+assert(isObservable(ob));
 
 function assertNewObjectSet(prop, newValue, oldValue) {
   callCount++;
@@ -16,6 +17,7 @@ function assertNewObjectSet(prop, newValue, oldValue) {
 ob.addPropertyChangeHandler(assertNewObjectSet);
 ob.nobj = { yy: 'lol' };
 assert(callCount === 1);
+assert(isObservable(ob.nobj));
 ob.nobj = ob.nobj;
 assert(callCount === 1);
 ob.removePropertyChangeHandler(assertNewObjectSet);
@@ -44,17 +46,18 @@ callCount = 0;
 callCount2 = 0;
 
 let removed = ob.nobj;
-function captureNestedObject(prop, newValue, oldValue) {
+function assertNestedObjectChange(prop, newValue, oldValue) {
   callCount++;
   assert(prop === 'nobj');
   assert(newValue.xx === 'hhhh');
   assert(oldValue.yy === 'lmao');
   assert(oldValue === removed);
 }
-ob.addPropertyChangeHandler(captureNestedObject);
+ob.addPropertyChangeHandler(assertNestedObjectChange);
 ob.nobj = { xx: 'hhhh' };
 assert(callCount === 1);
-ob.removePropertyChangeHandler(captureNestedObject);
+assert(isObservable(removed));
+ob.removePropertyChangeHandler(assertNestedObjectChange);
 callCount = 0;
 
 function assertNoPropagationAfterReplaced() {
@@ -97,6 +100,9 @@ callCount = 0;
 callCount2 = 0;
 
 let deleted = ob.nobj;
+delete ob.nobj;
+assert(isObservable(deleted));
+
 function assertNoPropagationAfterDeletion() {
   assert.fail();
 }
@@ -106,7 +112,6 @@ function assertFieldChangeAfterDeletion(prop, newValue, oldValue) {
   assert(newValue === 'aha!');
   assert(oldValue === 'hmmm');
 }
-delete ob.nobj;
 ob.addPropertyChangeHandler(assertNoPropagationAfterDeletion);
 deleted.addPropertyChangeHandler(assertFieldChangeAfterDeletion);
 deleted.xx = 'aha!';
@@ -148,6 +153,10 @@ callCount = 0;
 callCount2 = 0;
 callCount3 = 0;
 
+let unset = ob.nobj;
+ob.nobj = undefined;
+assert(isObservable(unset));
+
 function assertNoPropagationAfterUnset() {
   assert.fail();
 }
@@ -157,10 +166,9 @@ function assertFieldChangeAfterUnset(prop, newValue, oldValue) {
   assert(newValue === 'nana!');
   assert(oldValue === 'haha!');
 }
-ob.nobj = undefined;
 ob.addPropertyChangeHandler(assertNoPropagationAfterUnset);
-deleted.addPropertyChangeHandler(assertFieldChangeAfterUnset);
-deleted.xx = 'nana!'
+unset.addPropertyChangeHandler(assertFieldChangeAfterUnset);
+unset.xx = 'nana!'
 assert(callCount === 1);
 ob.removePropertyChangeHandler(assertNoPropagationAfterUnset);
 deleted.removePropertyChangeHandler(assertFieldChangeAfterUnset);

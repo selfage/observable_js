@@ -2,8 +2,12 @@ let HANDLERS = Symbol('handlers');
 let OBSERVABLE = Symbol('observable');
 let PROPAGATION_HANDLERS = Symbol('propagationHandlers');
 
-module.exports = function makeObservable(obj) {
-  if (obj[OBSERVABLE]) {
+function isObservable(obj) {
+  return obj[OBSERVABLE]
+}
+
+function toObservable(obj) {
+  if (isObservable(obj)) {
     return obj;
   }
   obj[OBSERVABLE] = true;
@@ -33,7 +37,7 @@ module.exports = function makeObservable(obj) {
 
     let value = obj[prop];
     if (typeof value === 'object') {
-      value = makeObservable(value);
+      value = toObservable(value);
       obj[PROPAGATION_HANDLERS][prop] =
         (nestedProp, nestedNewValue, nestedOldValue, nestedObj) => {
           obj.onPropertyChange(prop, nestedObj, nestedObj, obj);
@@ -46,7 +50,7 @@ module.exports = function makeObservable(obj) {
   return new Proxy(obj, {
     set: (obj, prop, newValue) => {
       if (typeof newValue === 'object') {
-        newValue = makeObservable(newValue);
+        newValue = toObservable(newValue);
       }
       let oldValue = obj[prop];
       if (oldValue === newValue) {
@@ -83,3 +87,8 @@ module.exports = function makeObservable(obj) {
     }
   });
 }
+
+module.exports = {
+  toObservable: toObservable,
+  isObservable: isObservable
+};
