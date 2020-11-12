@@ -1,6 +1,6 @@
 {
   "name": "@selfage/observable_js",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Observe objects through ES6 Proxy.",
   "main": "index.js",
   "repository": {
