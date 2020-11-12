@@ -144,7 +144,7 @@ function logChange(prop, newValue, oldValue) {
 ob.addPropertyChangeHandler(logChange);
 delete ob.num;
 // Print "num is changed from 100 to undefined".
-ob.num = undefined.
+ob.num = undefined;
 // Nothing to print, since ob.num === undefined already.
 // If we set `ob.num = undefined` first and `delete ob.num`, logChange() will also not be invoked
 // for `delete ob.num`.
@@ -192,7 +192,7 @@ ob.addPropertyChangeHandler(countTopLevelChange);
 ob.nobj.addPropertyChangeHandler(countSecondLevelChange);
 ob.nobj.value = 400;
 // topLevelCount === 1 && secondLevelCount === 1
-capturedSecondLevel.obj.value = 500;
+capturedSecondLevel.value = 500;
 // No change: topLevelCount === 1 && secondLevelCount === 1
 capturedTopLevel.obj.num = 0;
 // No change: topLevelCount === 1 && secondLevelCount === 1
