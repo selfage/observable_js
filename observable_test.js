@@ -5,6 +5,7 @@ let rawObj = {
   num: 12,
   arr: [123, 32],
   nobj: {
+    num: 111,
     anobj: {
       num: 90
     }
@@ -13,30 +14,28 @@ let rawObj = {
 assert(!isObservable(rawObj));
 assert(!isObservable(rawObj.arr));
 assert(!isObservable(rawObj.nobj));
+assert(!isObservable(rawObj.nobj.anobj));
 
 let ob = toObservable(rawObj);
 assert(isObservable(ob));
 assert(isObservable(ob.arr));
 assert(isObservable(ob.nobj));
+assert(isObservable(ob.nobj.anobj));
 
 let callCount = 0;
 let callCount2 = 0;
 let callCount3 = 0;
 
-let captured = {value: undefined};
 function assertNumberChange(prop, newValue, oldValue, obj) {
   callCount++;
   assert(prop === 'num');
   assert(newValue === 13);
   assert(oldValue === 12);
-  captured.value = obj;
 }
 ob.addPropertyChangeHandler(assertNumberChange);
 ob.num = 13;
 assert(callCount === 1);
 ob.num = 13;
-assert(callCount === 1);
-captured.value.num = 14;
 assert(callCount === 1);
 ob.removePropertyChangeHandler(assertNumberChange);
 ob.num = 15;
@@ -117,34 +116,72 @@ ob.arr.removePropertyChangeHandler(assertArrayElementChange);
 callCount = 0;
 callCount2 = 0;
 
-function assertPropagatedNumberChange(prop, newValue, oldValue) {
+let capturedTop = {obj: undefined, nested: undefined};
+function assertPropagatedNumberChange(prop, newValue, oldValue, obj) {
   callCount++;
   assert(prop === 'nobj');
   assert(newValue.anobj.num === 80);
   assert(newValue === oldValue);
+  capturedTop.obj = obj;
+  capturedTop.nested = newValue;
 }
-function assertSecondLevelNumberChange(prop, newValue, oldValue) {
+let capturedMiddle = {obj: undefined, nested: undefined};
+function assertMiddleLevelNumberChange(prop, newValue, oldValue, obj) {
   callCount2++;
   assert(prop === 'anobj');
   assert(newValue.num === 80);
   assert(newValue === oldValue);
+  capturedMiddle.obj = obj;
+  capturedMiddle.nested = newValue;
 }
-function assertNestedNumberChange(prop, newValue, oldValue) {
+let capturedBottom = {obj: undefined};
+function assertNestedNumberChange(prop, newValue, oldValue, obj) {
   callCount3++;
   assert(prop === 'num');
   assert(newValue === 80);
   assert(oldValue === 90);
+  capturedBottom.obj = obj;
 }
 ob.addPropertyChangeHandler(assertPropagatedNumberChange);
-ob.nobj.addPropertyChangeHandler(assertSecondLevelNumberChange);
+ob.nobj.addPropertyChangeHandler(assertMiddleLevelNumberChange);
 ob.nobj.anobj.addPropertyChangeHandler(assertNestedNumberChange);
 ob.nobj.anobj.num = 80;
 assert(callCount === 1);
 assert(callCount2 === 1);
 assert(callCount3 === 1);
 ob.removePropertyChangeHandler(assertPropagatedNumberChange);
-ob.nobj.removePropertyChangeHandler(assertSecondLevelNumberChange);
+ob.nobj.removePropertyChangeHandler(assertMiddleLevelNumberChange);
 ob.nobj.anobj.removePropertyChangeHandler(assertNestedNumberChange);
+callCount = 0;
+callCount2 = 0;
+callCount3 = 0;
+
+function countTopLevelChange() {
+  callCount++;
+}
+function countMiddleLevelChange() {
+  callCount2++;
+}
+function countBottomLevelChange() {
+  callCount3++;
+}
+ob.addPropertyChangeHandler(countTopLevelChange);
+ob.nobj.addPropertyChangeHandler(countMiddleLevelChange);
+ob.nobj.anobj.addPropertyChangeHandler(countBottomLevelChange);
+capturedBottom.obj.num = 100;
+capturedMiddle.obj.num = 222;
+capturedTop.obj.num = 23;
+assert(callCount === 0);
+assert(callCount2 === 0);
+assert(callCount3 === 0);
+capturedMiddle.nested.num = 110;
+capturedTop.nested.num = 34;
+assert(callCount === 2);
+assert(callCount2 === 2);
+assert(callCount3 === 1);
+ob.removePropertyChangeHandler(countTopLevelChange);
+ob.nobj.removePropertyChangeHandler(countMiddleLevelChange);
+ob.nobj.anobj.removePropertyChangeHandler(countBottomLevelChange);
 callCount = 0;
 callCount2 = 0;
 callCount3 = 0;

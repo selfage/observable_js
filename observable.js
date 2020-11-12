@@ -40,7 +40,7 @@ function toObservable(obj) {
       value = toObservable(value);
       obj[PROPAGATION_HANDLERS][prop] =
         (nestedProp, nestedNewValue, nestedOldValue, nestedObj) => {
-          obj.onPropertyChange(prop, nestedObj, nestedObj, obj);
+          obj.onPropertyChange(prop, value, value, obj);
         };
       value.addPropertyChangeHandler(obj[PROPAGATION_HANDLERS][prop]);
       obj[prop] = value;
@@ -59,15 +59,12 @@ function toObservable(obj) {
       
       if (typeof oldValue === 'object') {
         oldValue.removePropertyChangeHandler(obj[PROPAGATION_HANDLERS][prop]);
-        if (typeof newValue === 'object') {
-          newValue.addPropertyChangeHandler(obj[PROPAGATION_HANDLERS][prop]);
-        } else {
-          delete obj[PROPAGATION_HANDLERS][prop];
-        }
-      } else if (typeof newValue === 'object') {
+        delete obj[PROPAGATION_HANDLERS][prop];
+      }
+      if (typeof newValue === 'object') {
         obj[PROPAGATION_HANDLERS][prop] =
           (nestedProp, nestedNewValue, nestedOldValue, nestedObj) => {
-            obj.onPropertyChange(prop, nestedObj, nestedObj, obj);
+            obj.onPropertyChange(prop, newValue, newValue, obj);
           };
         newValue.addPropertyChangeHandler(obj[PROPAGATION_HANDLERS][prop]);
       }
