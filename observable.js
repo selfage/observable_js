@@ -14,7 +14,7 @@ function toObservable(obj) {
 
   obj[HANDLERS] = [];
   obj.addPropertyChangeHandler = (handler) => {
-  	obj[HANDLERS].push(handler);
+    obj[HANDLERS].push(handler);
   };
   obj.removePropertyChangeHandler = (handler) => {
     let index = obj[HANDLERS].indexOf(handler);
@@ -23,8 +23,8 @@ function toObservable(obj) {
     }
   };
   obj.onPropertyChange = (prop, newValue, oldValue, obj) => {
- 		for (let handler of obj[HANDLERS]) {
-    	handler(prop, newValue, oldValue, obj);
+    for (let handler of obj[HANDLERS]) {
+      handler(prop, newValue, oldValue, obj);
     }
   };
 
@@ -77,11 +77,15 @@ function toObservable(obj) {
     },
     deleteProperty: (obj, prop) => {
       let oldValue = obj[prop];
+      delete obj[prop];
+      if (oldValue === undefined) {
+        return true;
+      }
+
       if (typeof oldValue === 'object') {
         oldValue.removePropertyChangeHandler(obj[PROPAGATION_HANDLERS][prop]);
+        delete obj[PROPAGATION_HANDLERS][prop];
       }
-      delete obj[prop];
-      delete obj[PROPAGATION_HANDLERS][prop];
       obj.onPropertyChange(prop, undefined, oldValue, obj);
       return true;
     }
