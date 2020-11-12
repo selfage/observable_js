@@ -33,7 +33,7 @@ function addPropertyChangeHandler(handler) {}
 /**
  * Available on an observable object. Removing takes O(n) time where n is the number of all handlers added to
  * the observable object.
- * @param {Function} handler - Must have the same reference to a handler added above.
+ * @param {Handler} handler - Must have the same reference to a handler added above.
  * @returns {void}
  **/
 function removePropertyChangeHandler(handler) {}
