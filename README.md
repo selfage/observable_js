@@ -16,7 +16,7 @@ function isObservable(obj) {}
 
 /**
  * @callback Handler
- * @param {string} - Prop the name of the changed property.
+ * @param {string} prop - The name of the changed property.
  * @param {any} newValue - The new value of the changed property.
  * @param {any} oldValue - The supposed old value of the changed proerpty. When propagated, it's the same as
  *   `newValue`.
@@ -192,7 +192,7 @@ ob.addPropertyChangeHandler(countTopLevelChange);
 ob.nobj.addPropertyChangeHandler(countSecondLevelChange);
 ob.nobj.value = 400;
 // topLevelCount === 1 && secondLevelCount === 1
-capturedSecondLevel.value = 500;
+capturedSecondLevel.obj.value = 500;
 // No change: topLevelCount === 1 && secondLevelCount === 1
 capturedTopLevel.obj.num = 0;
 // No change: topLevelCount === 1 && secondLevelCount === 1
