@@ -1,20 +1,20 @@
 {
   "name": "@selfage/observable_js",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Observe objects through ES6 Proxy.",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/teststaybaka/observable_js.git"
+    "url": "git+https://github.com/selfage/observable_js.git"
   },
   "keywords": [
     "observable",
     "serializable"
   ],
   "author": "Yuxuan Xie <teststaybaka@gmail.com> (http://www.yuxuanxie.com)",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/teststaybaka/observable_js/issues"
+    "url": "https://github.com/selfage/observable_js/issues"
   },
-  "homepage": "https://github.com/teststaybaka/observable_js#readme"
+  "homepage": "https://github.com/selfage/observable_js#readme"
 }

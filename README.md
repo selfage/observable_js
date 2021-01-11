@@ -10,7 +10,8 @@ Observe objects through ES6 Proxy.
 function toObservable(obj) {}
 /**
  * @param {object} obj - Any object except null.
- * @returns {boolean} true if `obj` is observable. See caveats for when it's not accurate.
+ * @returns {boolean} true if `obj` is observable. See caveats for when it's not
+ *   accurate.
  **/
 function isObservable(obj) {}
 
@@ -18,22 +19,25 @@ function isObservable(obj) {}
  * @callback Handler
  * @param {string} prop - The name of the changed property.
  * @param {any} newValue - The new value of the changed property.
- * @param {any} oldValue - The supposed old value of the changed proerpty. When propagated, it's the same as
- *   `newValue`.
- * @param {object} obj - The object to which the property belongs. See caveats if you want to use it.
+ * @param {any} oldValue - The supposed old value of the changed proerpty. When
+ *   propagated, it's the same as `newValue`.
+ * @param {object} obj - The object to which the property belongs. See caveats
+ *   if you want to use it.
  * @returns {void}
  */
 /**
  * Available on an observable object.
- * @param {Handler} handler - To be be invoked when there is a change on any properties belonged to the
- *   observable object.
- * @returns {void} after calling all added handlers and don't wait for async operations.
+ * @param {Handler} handler - To be be invoked when there is a change on any
+ *   properties belonged to the observable object.
+ * @returns {void} after calling all added handlers and don't wait for async
+ *   operations.
  **/
 function addPropertyChangeHandler(handler) {}
 /**
- * Available on an observable object. Removing takes O(n) time where n is the number of all handlers added to
- * the observable object.
- * @param {Handler} handler - Must have the same reference to a handler added above.
+ * Available on an observable object. Removing takes O(n) time where n is the
+ * number of all handlers added to the observable object.
+ * @param {Handler} handler - Must have the same reference to a handler added
+ *   above.
  * @returns {void}
  **/
 function removePropertyChangeHandler(handler) {}
@@ -62,7 +66,8 @@ ob.num = 150;
 ```
 
 ## Array
-Array is just an object, except that its `length` property can be updated when push() or pop(). Note that its index is treated as a string.
+Array is just an object, except that its `length` property can be updated when
+`push()` or `pop()`. Note that its index is treated as a string.
 ```javascript
 const {toObservable, isObservable} = require('@selfage/observable_js');
 
@@ -71,7 +76,9 @@ console.log(isObservable(ob));
 // Print true
 
 function logChange(prop, newValue, oldValue) {
-  console.log(`${prop}[${typeof prop}] is changed from ${oldValue} to ${newValue}.`);
+  console.log(
+    `${prop}[${typeof prop}] is changed from ${oldValue} to ${newValue}.`
+  );
 }
 ob.addPropertyChangeHandler(logChange);
 ob[2] = 100;
@@ -85,7 +92,9 @@ ob.pop();
 ```
 
 ## Nested object
-All nested objects will be observable. Changes in nested objects are propagated/bubbled up until the top-level object. However, newValue and oldValue refer to the same nested object after propagating/bubbling up.
+All nested objects will be observable. Changes in nested objects are
+propagated/bubbled up until the top-level object. However, newValue and oldValue
+refer to the same nested object after propagating/bubbling up.
 ```javascript
 const {toObservable, isObservable} = require('@selfage/observable_js');
 
@@ -99,7 +108,10 @@ console.log(isObservable(ob.nobj));
 // Print "true"
 
 function logChange(prop, newValue, oldValue) {
-  console.log(`${prop} is changed from ${JSON.stringify(oldValue)} to ${JSON.stringify(newValue)}.`);
+  console.log(
+    `${prop} is changed from ${JSON.stringify(oldValue)} to ` +
+    `${JSON.stringify(newValue)}.`
+  );
 }
 ob.addPropertyChangeHandler(logChange);
 ob.nobj.addPropertyChangeHandler(logChange);
@@ -146,12 +158,12 @@ delete ob.num;
 // Print "num is changed from 100 to undefined".
 ob.num = undefined;
 // Nothing to print, since ob.num === undefined already.
-// If we set `ob.num = undefined` first and `delete ob.num`, logChange() will also not be invoked
-// for `delete ob.num`.
+// If we set `ob.num = undefined` first and `delete ob.num`, logChange() will
+// also not be invoked for `delete ob.num`.
 delete ob.num;
 // Still nothing to print.
-// You should decide to delete or set to undefined, depending on how you would deal with
-// `'num' in ob` or `Object.keys()`.
+// You should decide to delete or set to undefined, depending on how you woul
+// deal with `'num' in ob` or `Object.keys()`.
 ```
 
 ## Is object passed to handlers observable?
@@ -199,8 +211,12 @@ capturedTopLevel.obj.num = 0;
 capturedTopLevel.nestedObj.value = 600;
 // topLevelCount === 2 && secondLevelCount === 2
 // Conclusion: The fourth parameter `obj` is not trully observable, although
-// `isObservable(capturedTopLevel.obj)` and `isObservable(capturedSecondLevel.obj)` are both true;
+// `isObservable(capturedTopLevel.obj)` and
+// `isObservable(capturedSecondLevel.obj)` are both true;
 ```
 
 # More cases
-You can find almost all use cases in [observable_test.js](https://github.com/teststaybaka/observable_js/blob/main/observable_test.js) and [observable_test2.js](https://github.com/teststaybaka/observable_js/blob/main/observable_test2.js).
+You can find almost all use cases in
+[observable_test.js](https://github.com/teststaybaka/observable_js/blob/main/observable_test.js)
+and
+[observable_test2.js](https://github.com/teststaybaka/observable_js/blob/main/observable_test2.js).
